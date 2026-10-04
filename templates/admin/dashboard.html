@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الأدمن - رحلة المليونير</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: #0a0510; color: #fff; min-height: 100vh;
+        }
+        .topbar {
+            background: linear-gradient(90deg, #2a1540, #150820);
+            border-bottom: 2px solid #E8B947;
+            padding: 16px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .topbar h1 { color: #FFD84D; font-size: 22px; font-weight: 900; }
+        .topbar-actions { display: flex; gap: 10px; }
+        .btn {
+            padding: 8px 16px; border-radius: 8px; border: none;
+            font-family: inherit; font-weight: 900; font-size: 13px;
+            cursor: pointer; text-decoration: none;
+        }
+        .btn-gold { background: linear-gradient(135deg, #ffd84d, #b88728); color: #1a0b2e; }
+        .btn-danger { background: linear-gradient(135deg, #ff4d4d, #aa1e1e); color: #fff; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        
+        .stats-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: linear-gradient(145deg, #1a1330, #0d0919);
+            border: 2px solid rgba(232,185,71,.3);
+            border-radius: 14px; padding: 20px; text-align: center;
+        }
+        .stat-value { font-size: 36px; font-weight: 900; color: #FFD84D; }
+        .stat-label { font-size: 13px; color: #b9adca; margin-top: 4px; }
+        
+        .search-box { margin-bottom: 20px; }
+        .search-box input {
+            width: 100%; padding: 14px 18px;
+            background: rgba(255,255,255,.06);
+            border: 2px solid rgba(232,185,71,.3);
+            border-radius: 12px; color: #fff; font-size: 15px;
+            font-family: inherit; outline: none;
+        }
+        .search-box input:focus {
+            border-color: #FFD84D;
+            box-shadow: 0 0 20px rgba(255,216,77,.3);
+        }
+        
+        .users-table {
+            background: linear-gradient(145deg, #1a1330, #0d0919);
+            border: 2px solid rgba(232,185,71,.3);
+            border-radius: 14px; overflow: hidden;
+        }
+        .users-table table { width: 100%; border-collapse: collapse; }
+        .users-table th {
+            background: rgba(232,185,71,.1); color: #FFD84D;
+            padding: 14px; text-align: right; font-size: 13px;
+            border-bottom: 2px solid rgba(232,185,71,.3);
+        }
+        .users-table td {
+            padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.06);
+            font-size: 14px;
+        }
+        .users-table tr:hover { background: rgba(255,216,77,.05); }
+        
+        .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 10px;
+            font-size: 11px; font-weight: 900;
+        }
+        .badge-admin { background: #FFD84D; color: #1a0b2e; }
+        .badge-banned { background: #ff4d4d; color: #fff; }
+        .badge-active { background: #4dff88; color: #0d0919; }
+        
+        .action-btn {
+            padding: 6px 12px; border-radius: 8px; border: none;
+            font-family: inherit; font-weight: 900; font-size: 12px;
+            cursor: pointer; margin-left: 4px;
+        }
+        .action-edit { background: rgba(232,185,71,.2); color: #FFD84D; border: 1px solid #FFD84D; }
+        .action-money { background: rgba(77,255,136,.2); color: #4dff88; border: 1px solid #4dff88; }
+        .action-ban { background: rgba(255,77,77,.2); color: #ff4d4d; border: 1px solid #ff4d4d; }
+        
+        /* Modal */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,.85);
+            display: none; align-items: center; justify-content: center;
+            z-index: 9999; padding: 20px;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: linear-gradient(145deg, #1a1330, #0d0919);
+            border: 3px solid #E8B947; border-radius: 20px;
+            padding: 28px; width: 100%; max-width: 500px;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal h2 { color: #FFD84D; margin-bottom: 20px; text-align: center; }
+        .modal .form-group { margin-bottom: 14px; }
+        .modal label { color: #FFD84D; font-size: 13px; font-weight: 700; display: block; margin-bottom: 6px; }
+        .modal input {
+            width: 100%; padding: 12px 16px; border-radius: 10px;
+            border: 2px solid rgba(232,185,71,.3);
+            background: rgba(255,255,255,.06); color: #fff;
+            font-size: 15px; font-family: inherit; outline: none;
+        }
+        .modal input:focus { border-color: #FFD84D; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; }
+        .modal-save { background: linear-gradient(135deg, #4dff88, #1eaa55); color: #0d0919; }
+        .modal-cancel { background: linear-gradient(135deg, #666, #333); color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <h1>🎛️ لوحة الأدمن</h1>
+    <div class="topbar-actions">
+        <a href="/" class="btn btn-gold">🎮 اللعبة</a>
+        <a href="/logout" class="btn btn-danger">🚪 خروج</a>
+    </div>
+</div>
+
+<div class="container">
+    <!-- الإحصائيات -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_users }}</div>
+            <div class="stat-label">إجمالي اللاعبين</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_admins }}</div>
+            <div class="stat-label">الأدمن</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_banned }}</div>
+            <div class="stat-label">المحظورين</div>
+        </div>
+    </div>
+
+    <!-- البحث -->
+    <div class="search-box">
+        <input type="text" id="search" placeholder="🔍 ابحث عن لاعب بالاسم أو الإيميل...">
+    </div>
+
+    <!-- جدول اللاعبين -->
+    <div class="users-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>الاسم</th>
+                    <th>الإيميل</th>
+                    <th>💰 الفلوس</th>
+                    <th>💎 الجواهر</th>
+                    <th>الحالة</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="users-tbody">
+                {% for user in users %}
+                <tr data-id="{{ user.id }}" data-username="{{ user.username|lower }}" data-email="{{ (user.email or '')|lower }}">
+                    <td>{{ user.id }}</td>
+                    <td>
+                        {{ user.username }}
+                        {% if user.is_admin %}<span class="badge badge-admin">أدمن</span>{% endif %}
+                    </td>
+                    <td>{{ user.email or '—' }}</td>
+                    <td>{{ user.save.money if user.save else 0 }} $</td>
+                    <td>{{ user.save.gems if user.save else 0 }} 💎</td>
+                    <td>
+                        {% if user.is_banned %}
+                            <span class="badge badge-banned">محظور</span>
+                        {% else %}
+                            <span class="badge badge-active">نشط</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- ✅ الطريقة الجديدة: data-attributes بدل onclick -->
+                        <button class="action-btn action-money" 
+                                data-user-id="{{ user.id }}" 
+                                data-action="give" 
+                                data-type="money" 
+                                data-amount="1000"
+                                type="button">+1000$</button>
+                        
+                        <button class="action-btn action-money" 
+                                data-user-id="{{ user.id }}" 
+                                data-action="give" 
+                                data-type="gems" 
+                                data-amount="100"
+                                type="button">+100💎</button>
+                        
+                        <button class="action-btn action-edit" 
+                                data-user-id="{{ user.id }}" 
+                                data-action="edit"
+                                type="button">تعديل</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal للتعديل -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <h2>تعديل اللاعب</h2>
+        <input type="hidden" id="edit-id">
+        
+        <div class="form-group">
+            <label>💰 الفلوس</label>
+            <input type="number" id="edit-money" min="0">
+        </div>
+        <div class="form-group">
+            <label>💎 الجواهر</label>
+            <input type="number" id="edit-gems" min="0">
+        </div>
+        <div class="form-group">
+            <label>⭐ المستوى</label>
+            <input type="number" id="edit-level" min="1">
+        </div>
+        <div class="form-group">
+            <label>🚫 محظور؟</label>
+            <input type="checkbox" id="edit-banned" style="width:auto; margin-right:10px;">
+        </div>
+        
+        <div class="modal-actions">
+            <button class="modal-save" onclick="saveEdit()" type="button">💾 حفظ</button>
+            <button class="modal-cancel" onclick="closeModal()" type="button">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==========================================
+// البحث
+// ==========================================
+document.getElementById('search').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    document.querySelectorAll('#users-tbody tr').forEach(tr => {
+        const username = tr.dataset.username || '';
+        const email = tr.dataset.email || '';
+        const match = username.includes(q) || email.includes(q);
+        tr.style.display = match ? '' : 'none';
+    });
+});
+
+// ==========================================
+// فتح Modal التعديل
+// ==========================================
+async function openEdit(userId) {
+    const res = await fetch(`/admin/api/user/${userId}`);
+    const data = await res.json();
+    
+    document.getElementById('edit-id').value = data.id;
+    document.getElementById('edit-money').value = data.money;
+    document.getElementById('edit-gems').value = data.gems;
+    document.getElementById('edit-level').value = data.level;
+    document.getElementById('edit-banned').checked = data.is_banned;
+    
+    document.getElementById('edit-modal').classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('edit-modal').classList.remove('show');
+}
+
+// ==========================================
+// حفظ التعديلات
+// ==========================================
+async function saveEdit() {
+    const id = document.getElementById('edit-id').value;
+    const res = await fetch(`/admin/api/user/${id}/set`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            money: parseInt(document.getElementById('edit-money').value),
+            gems: parseInt(document.getElementById('edit-gems').value),
+            level: parseInt(document.getElementById('edit-level').value),
+            is_banned: document.getElementById('edit-banned').checked
+        })
+    });
+    const data = await res.json();
+    if (data.success) {
+        location.reload();
+    }
+}
+
+// ==========================================
+// إضافة سريعة (فلوس/جواهر)
+// ==========================================
+async function quickGive(userId, type, amount) {
+    const body = {};
+    body[type] = amount;
+    const res = await fetch(`/admin/api/user/${userId}/give`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.success) {
+        location.reload();
+    }
+}
+
+// ==========================================
+// ✅ ربط الأزرار (بدل onclick)
+// ==========================================
+document.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const userId = parseInt(this.dataset.userId);
+        const action = this.dataset.action;
+        
+        if (action === 'give') {
+            const type = this.dataset.type;
+            const amount = parseInt(this.dataset.amount);
+            quickGive(userId, type, amount);
+        } else if (action === 'edit') {
+            openEdit(userId);
+        }
+    });
+});
+</script>
+</body>
+</html>

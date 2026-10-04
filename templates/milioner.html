@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>رحلة المليونير</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='milioner.css') }}">
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════
+         شاشة البداية
+         ═══════════════════════════════════════════ -->
+    <section id="splash-screen" class="screen splash-screen">
+        <div class="logo">
+            <div class="logo-small">رحلة</div>
+            <h1>المليونير</h1>
+        </div>
+        <button id="start-btn" class="gold-btn">ابدأ الرحلة</button>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         اللوبي
+         ═══════════════════════════════════════════ -->
+    <section id="lobby-screen" class="screen lobby-screen hidden">
+        <header class="top-bar">
+            <div class="profile">
+                <div class="avatar" id="player-avatar">👤</div>
+                <div class="profile-info">
+                    <strong id="player-name">لاعب</strong>
+                    <span>المستوى <b id="player-level">1</b></span>
+                </div>
+            </div>
+            <div class="wallet">
+                <div class="currency">
+                    <span class="coin-icon"></span>
+                    <b id="money">1000</b>
+                </div>
+                <div class="currency">
+                    <span class="gem-icon"></span>
+                    <b id="gems">20</b>
+                </div>
+                <button id="logout-btn" class="logout-btn hidden" title="تسجيل الخروج" type="button">🚪</button>
+                <button id="leave-party-btn" class="logout-btn hidden" title="مغادرة المجموعة" type="button" style="background: rgba(255, 152, 0, 0.15); border-color: #ff9800; color: #ff9800; font-size: 20px;">✕</button>
+            </div>
+
+        </header>
+
+        <main class="lobby-world">
+            <nav class="side-menu left-menu">
+                <button class="menu-item" data-action="shop" type="button">
+                    <span class="menu-icon">متجر</span>
+                    <span>المتجر</span>
+                </button>
+                <button class="menu-item" data-action="quests" type="button">
+                    <span class="menu-icon">مهام</span>
+                    <span>المهام</span>
+                </button>
+                <button class="menu-item" data-action="gifts" type="button">
+                    <span class="menu-icon">هدايا</span>
+                    <span>الهدايا</span>
+                </button>
+            </nav>
+
+<section class="character-area" id="character-area">
+    <div id="party-zone" class="party-zone hidden">
+        <div class="party-slot" data-slot="left">
+            <div class="party-char hidden" data-role="left">
+                <img src="" alt="" class="party-char-img">
+                <div class="party-char-name"></div>
+            </div>
+        </div>
+        <div class="party-slot" data-slot="right">
+            <div class="party-char hidden" data-role="right">
+                <img src="" alt="" class="party-char-img">
+                <div class="party-char-name"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ شارة الليدر فوق الـ hero -->
+    <div id="hero-leader-badge" class="hero-leader-badge hidden">👑</div>
+
+    <div class="character-name">
+        <h2 id="hero-name">المغامر</h2>
+        <span id="hero-level">المستوى 1</span>
+    </div>
+    <div class="character-glow"></div>
+    <div class="character-platform">
+        <div id="hero-image" class="hero-image">ف</div>
+    </div>
+
+    <div id="party-slot-bottom" class="party-slot-bottom hidden">
+        <div class="party-char hidden" data-role="bottom">
+            <img src="" alt="" class="party-char-img">
+            <div class="party-char-name"></div>
+        </div>
+    </div>
+
+    <button id="play-btn" class="play-btn" type="button">
+        <span class="dice-shape"></span>
+        <span>العب الآن</span>
+    </button>
+    <!-- ✅ زر شات المجموعة -->
+    <button id="lobby-chat-btn" class="hidden" type="button" style="
+        position: fixed;
+        bottom: 95px;
+        right: 20px;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4a9fe8, #2a6fb8);
+        color: #fff;
+        font-size: 24px;
+        border: 3px solid #fff;
+        cursor: pointer;
+        z-index: 9998;
+        box-shadow: 0 0 25px rgba(74,159,232,0.8), 0 4px 12px rgba(0,0,0,0.5);
+    ">💬</button>
+
+    <!-- ✅ لوحة شات المجموعة -->
+    <div id="lobby-chat-panel" class="hidden" style="
+        position: fixed;
+        bottom: 160px;
+        right: 20px;
+        width: 320px;
+        height: 400px;
+        max-width: calc(100vw - 40px);
+        max-height: calc(100vh - 200px);
+        background: linear-gradient(180deg, #1a1330 0%, #0d0919 100%);
+        border: 3px solid #4a9fe8;
+        border-radius: 18px;
+        box-shadow: 0 0 40px rgba(74,159,232,0.5), 0 15px 40px rgba(0,0,0,0.9);
+        flex-direction: column;
+        z-index: 9998;
+        overflow: hidden;
+        direction: rtl;
+        font-family: Arial, sans-serif;
+    ">
+        <div style="padding: 10px 14px; background: linear-gradient(135deg, #2a1540, #150820); border-bottom: 2px solid #4a9fe8; display: flex; justify-content: space-between; align-items: center;">
+            <div style="color:#ffd84d; font-size:15px; font-weight:900;">💬 شات المجموعة</div>
+            <button id="lobby-chat-close" type="button" style="
+                width: 26px; height: 26px; border-radius: 50%;
+                background: rgba(255,255,255,0.1); color: #fff;
+                border: 1px solid rgba(255,255,255,0.3);
+                font-size: 15px; cursor: pointer;
+                display: grid; place-items: center; font-family: inherit;
+            ">✕</button>
+        </div>
+        <div id="lobby-chat-messages" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:8px; background:rgba(0,0,0,0.2);"></div>
+        <div style="display:flex; gap:6px; padding:10px; background:rgba(0,0,0,0.3); border-top:2px solid rgba(74,159,232,0.4);">
+            <input id="lobby-chat-input" type="text" maxlength="200" placeholder="اكتب رسالتك..." style="
+                flex:1; padding:10px 12px; border-radius:10px;
+                border:2px solid rgba(74,159,232,0.5);
+                background:rgba(255,255,255,0.08); color:#fff;
+                font-size:14px; font-family:inherit; outline:none; direction:rtl;
+            " />
+            <button id="lobby-chat-send" type="button" style="
+                padding:10px 16px; background:linear-gradient(135deg,#4a9fe8,#2a6fb8);
+                color:#fff; border:none; border-radius:10px;
+                font-size:14px; font-weight:900; cursor:pointer; font-family:inherit;
+            ">إرسال</button>
+        </div>
+    </div>
+</section>
+            <nav class="side-menu right-menu">
+                <button class="menu-item" data-action="home" type="button">
+                    <span class="menu-icon">بيت</span>
+                    <span>المنزل</span>
+                </button>
+                <button class="menu-item" data-action="characters" onclick="openCharactersScreen()" type="button">
+                    <span class="menu-icon">شخصيات</span>
+                    <span>الشخصيات</span>
+                </button>
+                <button class="menu-item" data-action="tools" type="button">
+                    <span class="menu-icon">أدوات</span>
+                    <span>الأدوات</span>
+                </button>
+                <button class="menu-item" id="admin-btn" onclick="window.location.href='/admin'" style="display:none;" type="button">
+                    <span class="menu-icon">🎛️</span>
+                    <span>الأدمن</span>
+                </button>
+            </nav>
+        </main>
+
+        <footer class="bottom-bar">
+            <!-- ✅ زرار الأصدقاء - مربوط بالنافذة -->
+            <button class="bottom-item" id="openFriendsBtn" data-action="friends" type="button">
+                <span>أصدقاء</span>
+                <small>الأصدقاء</small>
+                <span id="requestsBadge" class="badge hidden">0</span>
+            </button>
+            <button class="bottom-item" data-action="target" type="button">
+                <span>هدف</span>
+                <small>الهدف</small>
+            </button>
+            <button class="bottom-item" data-action="ranking" type="button">
+                <span>ترتيب</span>
+                <small>الترتيب العالمي</small>
+            </button>
+        </footer>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         شاشة اختيار نوع اللعب
+         ═══════════════════════════════════════════ -->
+    <section id="play-type-screen" class="screen play-type-screen hidden">
+        <h2 class="play-type-title">اختر طريقة اللعب</h2>
+        <div class="play-type-grid">
+            <button class="play-type-card" data-type="friends" type="button">
+                <div class="play-type-icon">👥</div>
+                <div class="play-type-name">مع الأصدقاء</div>
+                <div class="play-type-desc">العب مع أصدقائك</div>
+            </button>
+            <button class="play-type-card" data-type="bots" type="button">
+                <div class="play-type-icon">🤖</div>
+                <div class="play-type-name">مع البوتات</div>
+                <div class="play-type-desc">العب ضد الذكاء الاصطناعي</div>
+            </button>
+            <button class="play-type-card" data-type="random" type="button">
+                <div class="play-type-icon">🎲</div>
+                <div class="play-type-name">عشوائي</div>
+                <div class="play-type-desc">العب مع لاعبين عشوائيين</div>
+            </button>
+        </div>
+        <button id="play-type-back-btn" class="mode-back" type="button">← رجوع</button>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         شاشة اختيار وضع اللعب
+         ═══════════════════════════════════════════ -->
+    <section id="mode-screen" class="screen mode-screen hidden">
+        <h2 class="mode-title">اختر وضع اللعب</h2>
+        <div class="mode-grid">
+            <button class="mode-card" data-mode="1v1" type="button">
+                <div class="mode-icon">⚔️</div>
+                <div class="mode-name">1 ضد 1</div>
+                <div class="mode-desc">لاعب ضد لاعب</div>
+            </button>
+            <button class="mode-card" data-mode="1v1v1" type="button">
+                <div class="mode-icon">🎯</div>
+                <div class="mode-name">1 ضد 1 ضد 1</div>
+                <div class="mode-desc">3 لاعبين</div>
+            </button>
+            <button class="mode-card" data-mode="1v1v1v1" type="button">
+                <div class="mode-icon">🏆</div>
+                <div class="mode-name">4 لاعبين</div>
+                <div class="mode-desc">الوضع الكلاسيكي</div>
+            </button>
+            <button class="mode-card" data-mode="2v2" type="button">
+                <div class="mode-icon">🤝</div>
+                <div class="mode-name">2 ضد 2</div>
+                <div class="mode-desc">فريقان متعاونان</div>
+            </button>
+        </div>
+        <button id="mode-back-btn" class="mode-back" type="button">← رجوع</button>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         شاشة الماب
+         ═══════════════════════════════════════════ -->
+    <section id="game-screen" class="screen game-screen hidden">
+        <header class="game-header">
+            <button id="back-btn" class="back-btn" type="button">رجوع</button>
+            <div class="game-title">
+                <strong>رحلة المليونير</strong>
+            </div>
+            <div class="game-wallet">
+                <span class="coin-icon"></span>
+                <strong id="game-money">1000</strong>
+            </div>
+        </header>
+        <main class="map-container">
+            <div id="game-board" class="game-board"></div>
+        </main>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         🎭 شاشة الشخصيات
+         ═══════════════════════════════════════════ -->
+    <section id="characters-screen" class="screen characters-screen hidden">
+
+        <header class="chars-header">
+            <button class="chars-back-btn" type="button" onclick="closeCharactersScreen()">
+                <span>←</span>
+            </button>
+            <h2 class="chars-title">🎭 الشخصيات</h2>
+            <div class="chars-currency">
+                <span class="chars-gems">💎 <b id="chars-gems-count">20</b></span>
+            </div>
+        </header>
+
+        <main class="chars-grid" id="chars-grid">
+            <!-- تُملأ من JavaScript -->
+        </main>
+
+        <div id="character-detail" class="character-detail hidden">
+            <div class="detail-backdrop" onclick="closeCharacterDetail()"></div>
+            <div class="detail-panel">
+                <button class="detail-close" type="button" onclick="closeCharacterDetail()">✕</button>
+
+                <div class="detail-hero">
+                    <div class="detail-image-wrapper">
+                        <img id="detail-image" src="" alt="">
+                        <div class="detail-rarity-badge" id="detail-rarity"></div>
+                    </div>
+                    <h3 id="detail-name">-</h3>
+                    <p id="detail-title" class="detail-title">-</p>
+                </div>
+
+                <div class="detail-passives">
+                    <h4>⚡ المهارات الخاصة</h4>
+                    <div id="detail-passives-list"></div>
+                </div>
+
+                <div class="detail-actions">
+                    <button id="detail-select-btn" class="detail-btn-primary" type="button">
+                        ✅ اختيار
+                    </button>
+                    <button id="detail-unlock-btn" class="detail-btn-gold hidden" type="button">
+                        🔓 فتح (500 💎)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+<!-- إشعار دعوة لوبي -->
+<div id="lobby-invite-notification" class="invite-notification hidden">
+    <div class="invite-content">
+        <div class="invite-icon">🏠</div>
+        <div class="invite-title">دعوة لمجموعة</div>
+        <div class="invite-from">
+            <b id="lobby-invite-from">-</b> يدعوك للانضمام
+        </div>
+        <div class="invite-actions">
+            <button id="lobby-invite-accept" type="button" class="invite-btn accept">قبول</button>
+            <button id="lobby-invite-reject" type="button" class="invite-btn reject">رفض</button>
+        </div>
+    </div>
+</div>
+    <!-- ═══════════════════════════════════════════
+         نوافذ الأصدقاء
+         ═══════════════════════════════════════════ -->
+
+    <!-- نافذة قائمة الأصدقاء -->
+    <div id="friendsModal" class="modal hidden">
+        <div class="modal-content friends-modal">
+
+            <div class="friends-header">
+                <h2>الأصدقاء</h2>
+                <span id="friendsCount" class="friends-count">0</span>
+                <button id="closeFriendsBtn" class="close-btn" type="button">×</button>
+            </div>
+
+            <div class="friends-actions">
+                <button id="openAddFriendBtn" class="btn-primary" type="button">+ إضافة صديق</button>
+                <button id="openRequestsBtn" class="btn-secondary" type="button">
+                    طلبات الصداقة
+                    <span id="requestsBadge2" class="badge hidden">0</span>
+                </button>
+            </div>
+
+            <div id="friendsList" class="friends-list">
+                <div id="friendsEmpty" class="empty-state hidden">
+                    <p>لا يوجد أصدقاء حتى الآن.</p>
+                    <p class="empty-sub">يمكنك البحث عن اللاعبين بالاسم وإرسال طلبات الصداقة.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة صديق -->
+    <div id="addFriendModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="friends-header">
+                <h3>إضافة صديق</h3>
+                <button id="closeAddFriendBtn" class="close-btn" type="button">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="searchUsernameInput" placeholder="ابحث باسم المستخدم" />
+                <button id="searchBtn" class="btn-primary" type="button">بحث</button>
+                <div id="searchResults" class="search-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة طلبات الصداقة -->
+    <div id="requestsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="friends-header">
+                <h3>طلبات الصداقة</h3>
+                <button id="closeRequestsBtn" class="close-btn" type="button">×</button>
+            </div>
+            <div class="modal-body">
+                <h4>الطلبات الواردة</h4>
+                <div id="incomingRequests"></div>
+                <h4>الطلبات المرسلة</h4>
+                <div id="outgoingRequests"></div>
+            </div>
+        </div>
+    </div>
+
+<!-- ═══════════════════════════════════════════
+     شاشة اختيار الشخصية الأولى
+     ═══════════════════════════════════════════ -->
+<section id="starter-screen" class="screen starter-screen hidden">
+    <div class="starter-inner">
+        <h2 class="starter-title">اختر شخصيتك</h2>
+        <p class="starter-sub">ستكون هذه شخصيتك الأولى في الرحلة</p>
+
+        <div class="starter-grid" id="starter-grid">
+            <!-- تُملأ من JavaScript -->
+        </div>
+
+        <button id="starter-confirm-btn" class="gold-btn" type="button" disabled>
+            ابدأ الرحلة
+        </button>
+    </div>
+    
+</section> 
+<!-- ═══════════════════════════════════════════
+     شاشة اختيار الفريق (2v2)
+     ═══════════════════════════════════════════ -->
+<section id="team-select-screen" class="screen team-select-screen hidden">
+    <div class="team-select-panel">
+        <h2 class="team-select-title">اختر فريقك</h2>
+        <p class="team-select-sub">وضع 2 ضد 2</p>
+
+        <div class="team-select-grid">
+            <button class="team-select-btn team-a" data-team="0" type="button">
+                <div class="team-select-icon">🔵</div>
+                <div class="team-select-name">الفريق الأول</div>
+                <div class="team-select-desc">اللون الأزرق</div>
+            </button>
+            <button class="team-select-btn team-b" data-team="1" type="button">
+                <div class="team-select-icon">🔴</div>
+                <div class="team-select-name">الفريق الثاني</div>
+                <div class="team-select-desc">اللون الأحمر</div>
+            </button>
+        </div>
+
+        <button id="team-select-back-btn" class="mode-back" type="button">← رجوع</button>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     مودال اختيار الفريق (للدعوات)
+     ═══════════════════════════════════════════ -->
+<div id="invite-team-modal" class="modal hidden">
+    <div class="modal-content invite-team-content">
+        <h3 class="invite-team-title">اختر فريقك</h3>
+        <p class="invite-team-sub" id="invite-team-sub">وضع 2 ضد 2</p>
+        <div class="invite-team-grid">
+            <button class="invite-team-btn team-a" data-team="0" type="button">
+                <span class="invite-team-icon">🔵</span>
+                <span>الفريق الأول</span>
+            </button>
+            <button class="invite-team-btn team-b" data-team="1" type="button">
+                <span class="invite-team-icon">🔴</span>
+                <span>الفريق الثاني</span>
+            </button>
+        </div>
+        <button id="invite-team-cancel-btn" class="mode-back" type="button">إلغاء</button>
+    </div>
+</div>
+<!-- ═══════════════════════════════════════════
+     شاشة غرفة الأصدقاء
+     ═══════════════════════════════════════════ -->
+<section id="room-screen" class="screen room-screen hidden">
+    <div class="room-panel">
+
+        <div class="room-header">
+            <h2>غرفة الانتظار</h2>
+            <button id="room-leave-btn" type="button">✕ مغادرة</button>
+        </div>
+
+        <div class="room-info">
+            <div>الوضع: <b id="room-mode">-</b></div>
+            <div>اللاعبون: <b id="room-count">0/0</b></div>
+        </div>
+
+        <div class="room-members" id="room-members"></div>
+
+        <div class="room-invites-section">
+            <h3>ادعُ أصدقاءك</h3>
+            <div id="room-friends-list" class="room-friends-list">
+                <p style="color:#888; text-align:center;">جاري التحميل...</p>
+            </div>
+        </div>
+
+        <button id="room-start-btn" class="room-start-btn" type="button" disabled>
+            ابدأ اللعبة
+        </button>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     إشعار دعوة للعب
+     ═══════════════════════════════════════════ -->
+<div id="invite-notification" class="invite-notification hidden">
+    <div class="invite-content">
+        <div class="invite-icon">🎮</div>
+        <div class="invite-title">دعوة للعب</div>
+        <div class="invite-from">
+            <b id="invite-host-name">-</b> يدعوك للانضمام
+        </div>
+        <div class="invite-mode">
+            الوضع: <b id="invite-mode">-</b> • <span id="invite-count">-</span>
+        </div>
+        <div class="invite-actions">
+            <button id="invite-accept-btn" type="button" class="invite-btn accept">قبول</button>
+            <button id="invite-reject-btn" type="button" class="invite-btn reject">رفض</button>
+        </div>
+    </div>
+</div> 
+<!-- ═══════════════════════════════════════════
+     شاشة البحث عن لاعبين (Matchmaking)
+     ═══════════════════════════════════════════ -->
+<section id="matchmaking-screen" class="screen matchmaking-screen hidden">
+    <div class="mm-panel">
+        <div class="mm-spinner">
+            <div class="mm-dot"></div>
+            <div class="mm-dot"></div>
+            <div class="mm-dot"></div>
+        </div>
+        <h2 class="mm-title">جاري البحث عن لاعبين...</h2>
+        <div class="mm-mode">الوضع: <b id="mm-mode-label">-</b></div>
+        <div class="mm-counter">
+            <b id="mm-current">0</b> / <span id="mm-capacity">0</span>
+        </div>
+        <div class="mm-bar">
+            <div id="mm-bar-fill" class="mm-bar-fill"></div>
+        </div>
+        <button id="mm-cancel-btn" class="gold-btn mm-cancel" type="button">إلغاء البحث</button>
+    </div>
+</section>
+<!-- ✅ Socket.IO Client -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="{{ url_for('static', filename='milioner.js') }}"></script>
+</body>
+
+</html>
